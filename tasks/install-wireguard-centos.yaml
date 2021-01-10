@@ -5,7 +5,7 @@
     name:
       - epel-release
       - elrepo-release
-    state: latest
+    state: installed
 
 - name: (CentOS) Ensure wireguard-dkms is absent
   become: true
@@ -19,4 +19,4 @@
     name:
       - kmod-wireguard
       - wireguard-tools
-    state: latest
+    state: installed

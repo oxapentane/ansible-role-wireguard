@@ -1,7 +1,7 @@
 ---
 # use distro-specific task to install wireguard
 - block:
-  - include_tasks: "./install-wireguard-{{ ansible_distribution|lower }}.yaml"
+  - include_tasks: "install-wireguard-{{ ansible_distribution|lower }}.yaml"
 
   - name: enable wireguard kernel module
     become: true

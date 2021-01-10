@@ -3,4 +3,4 @@
   become: true
   dnf:
     name: wireguard-tools
-    state: latest
+    state: installed
