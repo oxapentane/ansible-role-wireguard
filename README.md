@@ -7,6 +7,10 @@ HOWTO
 -----
 Set appropriate variables in your `inventory.yaml` (or hostvars, whereever you keep your host variables), add `wireguard` role, hit big red button, and you should be good to go.
 
+### Supported systems
+
+At the moment the setup tasks are only available for CentOS and Fedora.
+
 ### Example Config
 
 `inventory.yaml`
