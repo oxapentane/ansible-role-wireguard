@@ -1,0 +1,6 @@
+---
+wg_conf_dir: "/etc/wireguard"
+wg_conf_dir_mode: 0700
+wg_iface: "wg0"
+wg_conf_mode: 0600
+wg_listen_port: "51820"

@@ -1,0 +1,76 @@
+---
+# use distro-specific task to install wireguard
+- block:
+  - include_tasks: "./install-wireguard-{{ ansible_distribution|lower }}.yaml"
+
+  - name: enable wireguard kernel module
+    become: true
+    modprobe:
+      name: wireguard
+      state: present
+# end of the block
+- name: register config
+  become: true
+  stat:
+    path: "{{ wg_conf_dir }}/{{ wg_iface }}.conf"
+  register: wg_reg_config_file
+
+# generate the private key, if config doesn't exist
+- block:
+  - name: Generate wireguard private key
+    command: "wg genkey"
+    register: wg_reg_private_key
+
+  - name: Set wireguard private key fact
+    set_fact:
+      wg_private_key: "{{ wg_reg_private_key.stdout }}"
+  when: not wg_reg_config_file.stat.exists
+# end of the block
+
+# read the private key, if config exists
+- block:
+  - name: Read wireguard config
+    become: true
+    slurp:
+      src: "{{ wg_reg_config_file.stat.path }}"
+    register: wg_reg_config
+
+  - name: parse out private key fact
+    set_fact:
+      wg_private_key: "{{wg_reg_config.content | b64decode | regex_findall('PrivateKey = (.*)') | first }}"
+  when: wg_reg_config_file.stat.exists
+# end of the block
+
+# Derive pubkey and set the fact
+- name: Get wireguard public key from the private one
+  command: "wg pubkey"
+  args:
+    stdin: "{{ wg_private_key }}"
+  register: wg_reg_public_key
+
+- name: set wireguard public key fact
+  set_fact:
+    wg_public_key: "{{ wg_reg_public_key.stdout }}"
+
+# create the config
+- name: Create wireguard config dir
+  become: true
+  file:
+    dest: "{{ wg_conf_dir }}"
+    state: directory
+    mode: "{{ wg_conf_dir_mode }}"
+
+- name: Create wireguard config
+  become: true
+  template:
+    src: wireguard.conf.j2
+    dest: "{{ wg_conf_dir }}/{{ wg_iface }}.conf"
+    mode: "{{ wg_conf_mode}}"
+
+# at last: enable wireguard
+- name: Enable wireguard service now
+  become: true
+  service:
+    name: "wg-quick@{{ wg_iface }}"
+    state: started
+    enabled: yes

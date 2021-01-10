@@ -1,0 +1,22 @@
+---
+- name: (CentOS) Add EPEL and ELRepo
+  become: true
+  dnf:
+    name:
+      - epel-release
+      - elrepo-release
+    state: latest
+
+- name: (CentOS) Ensure wireguard-dkms is absent
+  become: true
+  dnf:
+    name: wireguard-dkms
+    state: absent
+
+- name: (CentOS) Install wireguard kernel module and tools
+  become: true
+  dnf:
+    name:
+      - kmod-wireguard
+      - wireguard-tools
+    state: latest

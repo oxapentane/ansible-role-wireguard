@@ -1,0 +1,47 @@
+# This config was deployed by Ansible
+# Any changes will drown in Lethe on next deployment
+[Interface]
+Address = {{ wg_address }}
+PrivateKey = {{ wg_private_key }}
+ListenPort = {{ wg_listen_port }}
+{% if wg_DNS is defined %}
+DNS = {{ wg_DNS }}
+{% endif %}
+{% if wg_preup is defined %}
+{% for preup_cmd in wg_preup %}
+PreUp = {{ preup_cmd }}
+{% endfor %}
+{% endif %}
+{% if wg_postup is defined %}
+{% for postup_cmd in wg_postup %}
+PostUp = {{ postup_cmd }}
+{% endfor %}
+{% endif %}
+{% if wg_predown is defined %}
+{% for predown_cmd in wg_predown %}
+PreDown = {{ predown_cmd }}
+{% endfor %}
+{% endif %}
+{% if wg_postdown is defined %}
+{% for postdown_cmd in wg_postdown %}
+PostDown = {{ postdown_cmd }}
+{% endfor %}
+{% endif %}
+{% for peer in ansible_play_hosts %}
+{% if peer != inventory_hostname and (wg_endpoint is defined or hostvars[peer].wg_endpoint is defined) %}
+
+[Peer]
+# {{ peer }}
+PublicKey = {{ hostvars[peer].wg_public_key }}
+AllowedIPs = {{ hostvars[peer].wg_allowed_IPs }}
+{% if hostvars[peer].wg_endpoint is defined and hostvars[peer].wg_listen_port is defined %}
+Endpoint = {{ hostvars[peer].wg_endpoint }}:{{ hostvars[peer].wg_listen_port }}
+{% endif %}
+{% if hostvars[peer].wg_endpoint is defined and wg_listen_port is defined %}
+Endpoint = {{ hostvars[peer].wg_endpoint }}:{{ wg_listen_port }}
+{% endif %}
+{% if hostvars[peer].wg_persistent_keepalive is defined %}
+PersistentKeepalive = {{ hostvars[peer].wg_persistent_keepalive }}
+{% endif %}
+{% endif %}
+{% endfor %}

@@ -1,0 +1,6 @@
+---
+- name: (Fedora) Install wireguard tools
+  become: true
+  dnf:
+    name: wireguard-tools
+    state: latest
