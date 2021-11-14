@@ -1,7 +1,7 @@
 ---
 # use distro-specific task to install wireguard
 - block:
-  - include_tasks: "install-wireguard-{{ ansible_distribution|lower }}.yaml"
+  - include_tasks: "install-wireguard-{{ ansible_os_family|lower }}.yaml"
 
   - name: enable wireguard kernel module
     become: true
@@ -72,5 +72,5 @@
   become: true
   service:
     name: "wg-quick@{{ wg_iface }}"
-    state: started
+    state: restarted
     enabled: yes

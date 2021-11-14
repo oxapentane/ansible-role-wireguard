@@ -1,0 +1,32 @@
+---
+- name: (CentOS/Rocky) Add EPEL and ELRepo
+  become: true
+  dnf:
+    name:
+      - epel-release
+      - elrepo-release
+    state: installed
+  when: ansible_facts['distribution'] == "CentOS" or ansible_facts['distribution'] == "Rocky"
+
+- name: (CentOS/Rocky) Ensure wireguard-dkms is absent
+  become: true
+  dnf:
+    name: wireguard-dkms
+    state: absent
+  when: ansible_facts['distribution'] == "CentOS" or ansible_facts['distribution'] == "Rocky"
+
+- name: (CentOS/Rocky) Install wireguard kernel module and tools
+  become: true
+  dnf:
+    name:
+      - kmod-wireguard
+      - wireguard-tools
+    state: installed
+  when: ansible_facts['distribution'] == "CentOS" or ansible_facts['distribution'] == "Rocky"
+
+- name: (Fedora) Install wireguard tools
+  become: true
+  dnf:
+    name: wireguard-tools
+    state: installed
+  when: ansible_facts['distribution'] == "Fedora"
